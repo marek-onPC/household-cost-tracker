@@ -44,6 +44,7 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "prettier": "^2.8.7",
+    "primeflex": "^3.3.0",
     "primeicons": "^6.0.1",
     "primereact": "^9.2.1",
     "react": "^18.2.0",

@@ -27,7 +27,10 @@
  */
 
 import "./index.css";
-import "./app";
+import "./App";
+import "primereact/resources/themes/md-dark-indigo/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
 
 console.log(
   '👋 This message is being logged by "renderer.js", included via webpack'
