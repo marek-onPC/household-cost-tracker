@@ -1,19 +1,25 @@
 import { ReactElement } from "react";
 import { TabView, TabPanel } from "primereact/tabview";
-import { Button } from 'primereact/button';
+import { Button } from "primereact/button";
 import { AppEvents } from "../types";
+import Settings from "./Settings";
 
 const { ipcRenderer } = window.require("electron");
 
 const MainStructure = (): ReactElement => {
   const closeApp = (): void => {
     ipcRenderer.send(AppEvents.CLOSE_APP);
-  }
+  };
 
   return (
     <>
       <div className="w-full flex mb-3 justify-content-end">
-        <Button icon="pi pi-power-off" rounded aria-label="Quit" onClick={closeApp} />
+        <Button
+          icon="pi pi-power-off"
+          rounded
+          aria-label="Quit"
+          onClick={closeApp}
+        />
       </div>
       <TabView>
         <TabPanel header="Add expenses" leftIcon="pi pi-money-bill mr-3">
@@ -37,6 +43,12 @@ const MainStructure = (): ReactElement => {
             eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci
             velit, sed quia non numquam eius modi.
           </p>
+        </TabPanel>
+        <TabPanel
+          header="Settings"
+          leftIcon="pi pi-cog mr-3"
+          className="ml-auto">
+          <Settings />
         </TabPanel>
       </TabView>
     </>
