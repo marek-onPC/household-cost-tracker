@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { AppEvents } from "../types";
-import Settings from "./Settings";
+import SettingsView from "./SettingsView";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -48,7 +48,7 @@ const MainStructure = (): ReactElement => {
           header="Settings"
           leftIcon="pi pi-cog mr-3"
           className="ml-auto">
-          <Settings />
+          <SettingsView />
         </TabPanel>
       </TabView>
     </>

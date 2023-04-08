@@ -6,7 +6,7 @@ import { Button } from "primereact/button";
 import { ListBox, ListBoxChangeEvent } from "primereact/listbox";
 import { DateFormat } from "../types";
 
-const Settings = (): ReactElement => {
+const SettingsView = (): ReactElement => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [selectedDateFormat, setSelectedDateFormat] =
     useState<DateFormat | null>(null);
@@ -99,4 +99,4 @@ const Settings = (): ReactElement => {
   );
 };
 
-export default Settings;
+export default SettingsView;
