@@ -4,12 +4,14 @@ import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { ListBox, ListBoxChangeEvent } from "primereact/listbox";
-import { DateFormat } from "../types";
+import { CurrencyFormat, CurrencyType, DateFormat, DateType } from "../types";
 
 const SettingsView = (): ReactElement => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [selectedDateFormat, setSelectedDateFormat] =
-    useState<DateFormat | null>(null);
+    useState<DateType | null>(null);
+  const [selectedCurrency, setSelectedCurrency] =
+    useState<CurrencyType | null>(null);
 
   const settingsSteps: Array<MenuItem> = [
     {
@@ -25,17 +27,24 @@ const SettingsView = (): ReactElement => {
       },
     },
     {
-      label: "Currencies",
+      label: "Currency",
       command: (event: MenuItemCommandEvent) => {
         console.log(event);
       },
     },
   ];
-  const dateFormats: DateFormat[] = [
-    { name: "DD.MM.YYYY", format: "DD.MM.YYYY" },
-    { name: "MM.DD.YYYY", format: "MM.DD.YYYY" },
-    { name: "YYYY.MM.DD", format: "YYYY.MM.DD" },
-    { name: "年YYYY月MM日DD", format: "年YYYY月MM日DD" },
+  const dateFormats: Array<DateFormat> = [
+    { name: DateType.DDMMYYYY, format: DateType.DDMMYYYY },
+    { name: DateType.MMDDYYYY, format: DateType.MMDDYYYY },
+    { name: DateType.YYYYMMDD, format: DateType.YYYYMMDD },
+    { name: DateType.ASIA_YYYYMMDD, format: DateType.ASIA_YYYYMMDD },
+  ];
+
+  const currencies: Array<CurrencyFormat> = [
+    { name: CurrencyType.EUR, format: CurrencyType.EUR },
+    { name: CurrencyType.USD, format: CurrencyType.USD },
+    { name: CurrencyType.YEN, format: CurrencyType.YEN },
+    { name: CurrencyType.PLN, format: CurrencyType.PLN },
   ];
 
   return (
@@ -75,7 +84,7 @@ const SettingsView = (): ReactElement => {
             <ListBox
               value={selectedDateFormat}
               onChange={(event: ListBoxChangeEvent) =>
-                setSelectedDateFormat(event.value)
+                setSelectedDateFormat(event.value.format)
               }
               options={dateFormats}
               optionLabel="name"
@@ -83,6 +92,33 @@ const SettingsView = (): ReactElement => {
             />
             <small id="dateformat-help" className="mt-2">
               Select date format you want to use.
+            </small>
+          </div>
+          <div className="ml-5 mb-5">
+            <Button
+              icon="pi pi-check"
+              rounded
+              aria-label="Filter"
+              size="small"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {activeStep === 2 ? (
+        <div className="card flex justify-content-center align-items-center mt-3">
+          <div className="card flex flex-column gap-2 justify-content-center">
+            <ListBox
+              value={selectedCurrency}
+              onChange={(event: ListBoxChangeEvent) =>
+                setSelectedCurrency(event.value.value)
+              }
+              options={currencies}
+              optionLabel="name"
+              className="w-full md:w-14rem"
+            />
+            <small id="dateformat-help" className="mt-2">
+              Select currency you want to use.
             </small>
           </div>
           <div className="ml-5 mb-5">
