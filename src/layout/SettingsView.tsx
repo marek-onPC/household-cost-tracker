@@ -1,36 +1,32 @@
-import { ReactElement, useState } from "react";
+import { ChangeEvent, ReactElement, useContext, useState } from "react";
 import { Steps, StepsSelectEvent } from "primereact/steps";
-import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
+import { MenuItem } from "primereact/menuitem";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { ListBox, ListBoxChangeEvent } from "primereact/listbox";
-import { CurrencyFormat, CurrencyType, DateFormat, DateType } from "../types";
+import {
+  AppSettingsContext,
+  CurrencyFormat,
+  CurrencyType,
+  DateFormat,
+  DateType,
+} from "../types";
+import { SettingsContext } from "../lib/SettingsContext";
 
 const SettingsView = (): ReactElement => {
+  const { settings, setSettings }: AppSettingsContext =
+    useContext(SettingsContext);
   const [activeStep, setActiveStep] = useState<number>(0);
-  const [selectedDateFormat, setSelectedDateFormat] =
-    useState<DateType | null>(null);
-  const [selectedCurrency, setSelectedCurrency] =
-    useState<CurrencyType | null>(null);
 
   const settingsSteps: Array<MenuItem> = [
     {
       label: "Basic",
-      command: (event: MenuItemCommandEvent) => {
-        console.log(event);
-      },
     },
     {
       label: "Date format",
-      command: (event: MenuItemCommandEvent) => {
-        console.log(event);
-      },
     },
     {
       label: "Currency",
-      command: (event: MenuItemCommandEvent) => {
-        console.log(event);
-      },
     },
   ];
   const dateFormats: Array<DateFormat> = [
@@ -62,6 +58,14 @@ const SettingsView = (): ReactElement => {
               id="username"
               aria-describedby="username-help"
               placeholder="Name"
+              maxLength={20}
+              value={settings.username ? settings.username : ""}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setSettings((prevSettings) => ({
+                  ...prevSettings,
+                  username: event.target.value,
+                }))
+              }
             />
             <small id="username-help" className="mt-2">
               Enter your name.
@@ -82,13 +86,16 @@ const SettingsView = (): ReactElement => {
         <div className="card flex justify-content-center align-items-center mt-3">
           <div className="card flex flex-column gap-2 justify-content-center">
             <ListBox
-              value={selectedDateFormat}
-              onChange={(event: ListBoxChangeEvent) =>
-                setSelectedDateFormat(event.value.format)
-              }
               options={dateFormats}
               optionLabel="name"
               className="w-full md:w-14rem"
+              value={settings.dateType}
+              onChange={(event: ListBoxChangeEvent) =>
+                setSettings((prevSettings) => ({
+                  ...prevSettings,
+                  dateType: event.value,
+                }))
+              }
             />
             <small id="dateformat-help" className="mt-2">
               Select date format you want to use.
@@ -109,13 +116,16 @@ const SettingsView = (): ReactElement => {
         <div className="card flex justify-content-center align-items-center mt-3">
           <div className="card flex flex-column gap-2 justify-content-center">
             <ListBox
-              value={selectedCurrency}
-              onChange={(event: ListBoxChangeEvent) =>
-                setSelectedCurrency(event.value.value)
-              }
               options={currencies}
               optionLabel="name"
               className="w-full md:w-14rem"
+              value={settings.currencyType}
+              onChange={(event: ListBoxChangeEvent) =>
+                setSettings((prevSettings) => ({
+                  ...prevSettings,
+                  currencyType: event.value,
+                }))
+              }
             />
             <small id="dateformat-help" className="mt-2">
               Select currency you want to use.

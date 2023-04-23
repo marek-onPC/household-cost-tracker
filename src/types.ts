@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export enum AppEvents {
   CLOSE_APP = "close_app",
 }
@@ -24,4 +26,15 @@ export interface DateFormat {
 export interface CurrencyFormat {
   name: CurrencyType;
   format: CurrencyType;
+}
+
+export interface AppSettings {
+  username: string | null;
+  dateType: DateType | null;
+  currencyType: CurrencyType | null;
+}
+
+export interface AppSettingsContext {
+  settings: AppSettings;
+  setSettings?: Dispatch<SetStateAction<AppSettings>>;
 }

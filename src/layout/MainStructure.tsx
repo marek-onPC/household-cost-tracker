@@ -1,18 +1,32 @@
-import { ReactElement } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
-import { AppEvents } from "../types";
+import { AppEvents, AppSettings, AppSettingsContext } from "../types";
 import SettingsView from "./SettingsView";
+import { SettingsContext } from "../lib/SettingsContext";
 
 const { ipcRenderer } = window.require("electron");
 
 const MainStructure = (): ReactElement => {
+  const [settingsValue, setSettingsValue] = useState<AppSettings>({
+    username: null,
+    dateType: null,
+    currencyType: null,
+  });
   const closeApp = (): void => {
     ipcRenderer.send(AppEvents.CLOSE_APP);
   };
 
+  const settingsContentProvider = useMemo<AppSettingsContext>(
+    () => ({
+      settings: settingsValue,
+      setSettings: setSettingsValue,
+    }),
+    [settingsValue, setSettingsValue]
+  );
+
   return (
-    <>
+    <SettingsContext.Provider value={settingsContentProvider}>
       <div className="w-full flex mb-3 justify-content-end">
         <Button
           icon="pi pi-power-off"
@@ -51,7 +65,7 @@ const MainStructure = (): ReactElement => {
           <SettingsView />
         </TabPanel>
       </TabView>
-    </>
+    </SettingsContext.Provider>
   );
 };
 
