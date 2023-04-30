@@ -13,6 +13,7 @@ const MainStructure = (): ReactElement => {
     dateType: null,
     currencyType: null,
   });
+
   const closeApp = (): void => {
     ipcRenderer.send(AppEvents.CLOSE_APP);
   };

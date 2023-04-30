@@ -5,6 +5,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { ListBox, ListBoxChangeEvent } from "primereact/listbox";
 import {
+  AppEvents,
   AppSettingsContext,
   CurrencyFormat,
   CurrencyType,
@@ -12,6 +13,8 @@ import {
   DateType,
 } from "../types";
 import { SettingsContext } from "../lib/SettingsContext";
+
+const { ipcRenderer } = window.require("electron");
 
 const SettingsView = (): ReactElement => {
   const { settings, setSettings }: AppSettingsContext =
@@ -28,6 +31,9 @@ const SettingsView = (): ReactElement => {
     {
       label: "Currency",
     },
+    {
+      label: "Save",
+    },
   ];
   const dateFormats: Array<DateFormat> = [
     { name: DateType.DDMMYYYY, format: DateType.DDMMYYYY },
@@ -42,6 +48,18 @@ const SettingsView = (): ReactElement => {
     { name: CurrencyType.YEN, format: CurrencyType.YEN },
     { name: CurrencyType.PLN, format: CurrencyType.PLN },
   ];
+
+  const disableSaveButton = () => {
+    if (settings.currencyType && settings.dateType && settings.username) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const saveSettings = (): void => {
+    ipcRenderer.send(AppEvents.SAVE_SETTINGS, settings);
+  };
 
   return (
     <div>
@@ -73,10 +91,13 @@ const SettingsView = (): ReactElement => {
           </div>
           <div className="ml-5 mb-5">
             <Button
-              icon="pi pi-check"
+              icon="pi pi-chevron-right"
               rounded
               aria-label="Filter"
               size="small"
+              onClick={() => {
+                setActiveStep(1);
+              }}
             />
           </div>
         </div>
@@ -103,10 +124,13 @@ const SettingsView = (): ReactElement => {
           </div>
           <div className="ml-5 mb-5">
             <Button
-              icon="pi pi-check"
+              icon="pi pi-chevron-right"
               rounded
               aria-label="Filter"
               size="small"
+              onClick={() => {
+                setActiveStep(2);
+              }}
             />
           </div>
         </div>
@@ -133,12 +157,26 @@ const SettingsView = (): ReactElement => {
           </div>
           <div className="ml-5 mb-5">
             <Button
-              icon="pi pi-check"
+              icon="pi pi-chevron-right"
               rounded
               aria-label="Filter"
               size="small"
+              onClick={() => {
+                setActiveStep(3);
+              }}
             />
           </div>
+        </div>
+      ) : null}
+
+      {activeStep === 3 ? (
+        <div className="card flex justify-content-center align-items-center mt-3">
+          <Button
+            label="Save settings"
+            icon="pi pi-check"
+            disabled={disableSaveButton()}
+            onClick={saveSettings}
+          />
         </div>
       ) : null}
     </div>

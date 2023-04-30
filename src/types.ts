@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 export enum AppEvents {
   CLOSE_APP = "close_app",
+  SAVE_SETTINGS = "save_settings",
 }
 
 export enum DateType {
