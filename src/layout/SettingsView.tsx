@@ -13,6 +13,7 @@ import {
   DateType,
 } from "../types";
 import { SettingsContext } from "../lib/SettingsContext";
+import { IpcRendererEvent } from "electron";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -20,6 +21,7 @@ const SettingsView = (): ReactElement => {
   const { settings, setSettings }: AppSettingsContext =
     useContext(SettingsContext);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const settingsSteps: Array<MenuItem> = [
     {
@@ -58,7 +60,14 @@ const SettingsView = (): ReactElement => {
   };
 
   const saveSettings = (): void => {
+    setIsSaving(true);
     ipcRenderer.send(AppEvents.SAVE_SETTINGS, settings);
+
+    ipcRenderer.once(AppEvents.SAVE_SETTINGS_RESPONSE, () => {
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+    });
   };
 
   return (
@@ -172,9 +181,9 @@ const SettingsView = (): ReactElement => {
       {activeStep === 3 ? (
         <div className="card flex justify-content-center align-items-center mt-3">
           <Button
-            label="Save settings"
-            icon="pi pi-check"
-            disabled={disableSaveButton()}
+            label={isSaving ? "... saving" : "Save settings"}
+            icon={isSaving ? "pi pi-spin pi-spinner" : "pi pi-check"}
+            disabled={disableSaveButton() || isSaving}
             onClick={saveSettings}
           />
         </div>
