@@ -4,6 +4,8 @@ export enum AppEvents {
   CLOSE_APP = "close_app",
   SAVE_SETTINGS = "save_settings",
   SAVE_SETTINGS_RESPONSE = "save_settings_response",
+  LOAD_SETTINGS = "load_settings",
+  LOAD_SETTINGS_RESPONSE = "load_settings_response",
 }
 
 export enum DateType {
@@ -32,8 +34,8 @@ export interface CurrencyFormat {
 
 export interface AppSettings {
   username: string | null;
-  dateType: DateType | null;
-  currencyType: CurrencyType | null;
+  dateType: DateFormat | null;
+  currencyType: CurrencyFormat | null;
 }
 
 export interface AppSettingsContext {

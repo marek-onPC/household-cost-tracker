@@ -1,4 +1,10 @@
-import { ChangeEvent, ReactElement, useContext, useState } from "react";
+import {
+  ChangeEvent,
+  ReactElement,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Steps, StepsSelectEvent } from "primereact/steps";
 import { MenuItem } from "primereact/menuitem";
 import { InputText } from "primereact/inputtext";
@@ -6,6 +12,7 @@ import { Button } from "primereact/button";
 import { ListBox, ListBoxChangeEvent } from "primereact/listbox";
 import {
   AppEvents,
+  AppSettings,
   AppSettingsContext,
   CurrencyFormat,
   CurrencyType,
@@ -21,6 +28,13 @@ const SettingsView = (): ReactElement => {
   const { settings, setSettings }: AppSettingsContext =
     useContext(SettingsContext);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [nameField, setNameField] = useState<string | null>(null);
+  const [dateFormatField, setDateFormatField] = useState<DateFormat | null>(
+    null
+  );
+  const [currencyField, setCurrencyField] = useState<CurrencyFormat | null>(
+    null
+  );
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const settingsSteps: Array<MenuItem> = [
@@ -52,7 +66,7 @@ const SettingsView = (): ReactElement => {
   ];
 
   const disableSaveButton = () => {
-    if (settings.currencyType && settings.dateType && settings.username) {
+    if (nameField && dateFormatField && currencyField) {
       return false;
     } else {
       return true;
@@ -61,14 +75,28 @@ const SettingsView = (): ReactElement => {
 
   const saveSettings = (): void => {
     setIsSaving(true);
-    ipcRenderer.send(AppEvents.SAVE_SETTINGS, settings);
-
-    ipcRenderer.once(AppEvents.SAVE_SETTINGS_RESPONSE, () => {
-      setTimeout(() => {
-        setIsSaving(false);
-      }, 1000);
+    ipcRenderer.send(AppEvents.SAVE_SETTINGS, {
+      username: nameField,
+      dateType: dateFormatField,
+      currencyType: currencyField,
     });
+
+    ipcRenderer.once(
+      AppEvents.SAVE_SETTINGS_RESPONSE,
+      (event: IpcRendererEvent, data: AppSettings | null) => {
+        setTimeout(() => {
+          setSettings(data);
+          setIsSaving(false);
+        }, 1000);
+      }
+    );
   };
+
+  useEffect(() => {
+    setNameField(settings.username);
+    setDateFormatField(settings.dateType);
+    setCurrencyField(settings.currencyType);
+  }, [settings]);
 
   return (
     <div>
@@ -86,12 +114,9 @@ const SettingsView = (): ReactElement => {
               aria-describedby="username-help"
               placeholder="Name"
               maxLength={20}
-              value={settings.username ? settings.username : ""}
+              value={nameField ? nameField : ""}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  username: event.target.value,
-                }))
+                setNameField(event.target.value)
               }
             />
             <small id="username-help" className="mt-2">
@@ -119,12 +144,9 @@ const SettingsView = (): ReactElement => {
               options={dateFormats}
               optionLabel="name"
               className="w-full md:w-14rem"
-              value={settings.dateType}
+              value={dateFormatField}
               onChange={(event: ListBoxChangeEvent) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  dateType: event.value,
-                }))
+                setDateFormatField(event.value)
               }
             />
             <small id="dateformat-help" className="mt-2">
@@ -152,12 +174,9 @@ const SettingsView = (): ReactElement => {
               options={currencies}
               optionLabel="name"
               className="w-full md:w-14rem"
-              value={settings.currencyType}
+              value={currencyField}
               onChange={(event: ListBoxChangeEvent) =>
-                setSettings((prevSettings) => ({
-                  ...prevSettings,
-                  currencyType: event.value,
-                }))
+                setCurrencyField(event.value)
               }
             />
             <small id="dateformat-help" className="mt-2">
