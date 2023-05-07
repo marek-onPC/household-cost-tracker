@@ -6,6 +6,7 @@ import { AppEvents, AppSettings, AppSettingsContext } from "../types";
 import SettingsView from "./SettingsView";
 import { SettingsContext } from "../lib/SettingsContext";
 import { IpcRendererEvent } from "electron";
+import AddView from "./AddView";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -90,15 +91,7 @@ const MainStructure = (): ReactElement => {
               header="Add expenses"
               leftIcon="pi pi-money-bill mr-3"
               disabled={shouldGrantAccess()}>
-              <p className="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p>
+              <AddView />
             </TabPanel>
             <TabPanel
               header="Review monthly expenses"

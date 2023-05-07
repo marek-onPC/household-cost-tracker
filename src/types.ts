@@ -9,11 +9,13 @@ export enum AppEvents {
 }
 
 export enum DateType {
-  DDMMYYYY = "DD.MM.YYYY",
-  MMDDYYYY = "MM.DD.YYYY",
-  YYYYMMDD = "YYYY.MM.DD",
-  ASIA_YYYYMMDD = "年YYYY月MM日DD",
+  DDMMYYYY = "dd.mm.yy",
+  MMDDYYYY = "mm.dd.yyy",
+  YYYYMMDD = "yy.mm.dd",
+  ASIA_YYYYMMDD = "年yy月mm日dd",
 }
+
+export type CurrencyCode = "USD" | "EUR" | "YEN" | "PLN";
 
 export enum CurrencyType {
   USD = "US Dollar",
@@ -29,7 +31,7 @@ export interface DateFormat {
 
 export interface CurrencyFormat {
   name: CurrencyType;
-  format: CurrencyType;
+  format: CurrencyCode;
 }
 
 export interface AppSettings {

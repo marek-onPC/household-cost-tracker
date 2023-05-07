@@ -59,10 +59,10 @@ const SettingsView = (): ReactElement => {
   ];
 
   const currencies: Array<CurrencyFormat> = [
-    { name: CurrencyType.EUR, format: CurrencyType.EUR },
-    { name: CurrencyType.USD, format: CurrencyType.USD },
-    { name: CurrencyType.YEN, format: CurrencyType.YEN },
-    { name: CurrencyType.PLN, format: CurrencyType.PLN },
+    { name: CurrencyType.EUR, format: "EUR" },
+    { name: CurrencyType.USD, format: "USD" },
+    { name: CurrencyType.YEN, format: "YEN" },
+    { name: CurrencyType.PLN, format: "PLN" },
   ];
 
   const disableSaveButton = () => {
