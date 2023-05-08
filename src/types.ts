@@ -6,6 +6,10 @@ export enum AppEvents {
   SAVE_SETTINGS_RESPONSE = "save_settings_response",
   LOAD_SETTINGS = "load_settings",
   LOAD_SETTINGS_RESPONSE = "load_settings_response",
+  SAVE_EXPENSE = "save_expense",
+  SAVE_EXPENSE_RESPONSE = "save_expense_response",
+  LOAD_EXPENSES = "load_expenses",
+  LOAD_EXPENSES_RESPONSE = "load_expenses_response",
 }
 
 export enum DateType {
@@ -43,4 +47,14 @@ export interface AppSettings {
 export interface AppSettingsContext {
   settings: AppSettings;
   setSettings?: Dispatch<SetStateAction<AppSettings>>;
+}
+
+export interface Expense {
+  date: Date;
+  expense: string;
+  amount: number;
+}
+
+export interface ExpenseFileStructure {
+  data: Array<Expense>;
 }

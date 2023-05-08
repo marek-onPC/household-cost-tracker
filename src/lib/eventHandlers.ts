@@ -1,5 +1,10 @@
 import { app, ipcMain } from "electron";
-import { AppEvents, AppSettingsContext } from "../types";
+import {
+  AppEvents,
+  AppSettingsContext,
+  Expense,
+  ExpenseFileStructure,
+} from "../types";
 import fs from "fs";
 import { USER_DATA_PATH } from "../constants";
 
@@ -42,4 +47,50 @@ export const loadSettingsEvent = () => {
       }
     });
   });
+};
+
+export const saveExpenseEvent = () => {
+  ipcMain.on(
+    AppEvents.SAVE_EXPENSE,
+    (event: Electron.IpcMainEvent, expenseData: Expense) => {
+      const YEAR = expenseData.date.getFullYear();
+      const MONTH = expenseData.date.getMonth() + 1;
+      const DIR = `${USER_DATA_PATH}/expenses/${YEAR}`;
+
+      if (!fs.existsSync(DIR)) {
+        fs.mkdirSync(DIR, { recursive: true });
+      }
+
+      if (!fs.existsSync(DIR)) {
+        fs.mkdirSync(DIR, { recursive: true });
+      }
+
+      fs.readFile(`${DIR}/${MONTH}.json`, "utf8", (err, data) => {
+        if (err && err.code === "ENOENT") {
+          fs.writeFile(
+            `${DIR}/${MONTH}.json`,
+            JSON.stringify({ data: [expenseData] } as ExpenseFileStructure),
+            (err) => {
+              if (err) {
+                event.reply(AppEvents.SAVE_EXPENSE_RESPONSE, false);
+              } else {
+                event.reply(AppEvents.SAVE_EXPENSE_RESPONSE, true);
+              }
+            }
+          );
+        } else {
+          const json = JSON.parse(data) as ExpenseFileStructure;
+          json.data.push(expenseData);
+
+          fs.writeFile(`${DIR}/${MONTH}.json`, JSON.stringify(json), (err) => {
+            if (err) {
+              event.reply(AppEvents.SAVE_EXPENSE_RESPONSE, false);
+            } else {
+              event.reply(AppEvents.SAVE_EXPENSE_RESPONSE, true);
+            }
+          });
+        }
+      });
+    }
+  );
 };
