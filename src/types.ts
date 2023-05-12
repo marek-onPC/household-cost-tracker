@@ -20,6 +20,7 @@ export enum ExpenseType {
   UTILITIES = "Utilities",
   MEDICAL_HEALTH = "Medical and Health",
   DINING_OUT = "Dining out and restaurants",
+  ENTERTAINMENT = "Entertainment",
 }
 
 export interface ExpenseDropdown {
