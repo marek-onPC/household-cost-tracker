@@ -1,10 +1,11 @@
 import { useState, ReactElement, useContext, ChangeEvent, useRef } from "react";
 import { Calendar, CalendarChangeEvent } from "primereact/calendar";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { SettingsContext } from "../lib/SettingsContext";
-import { AppEvents, Expense } from "../types";
+import { AppEvents, Expense, ExpenseDropdown, ExpenseType } from "../types";
 import { IpcRendererEvent } from "electron";
 import { Toast } from "primereact/toast";
 
@@ -13,14 +14,22 @@ const { ipcRenderer } = window.require("electron");
 const AddView = (): ReactElement => {
   const [date, setDate] = useState<string | Date | Date[] | null>(null);
   const [expense, setExpense] = useState<string>("");
-
-  // ADD PREDEFINED TYPES OF EXPENSES (DROPDOWN)
-
+  const [expenseType, setExpenseType] = useState<ExpenseType | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const { settings } = useContext(SettingsContext);
 
   const toast = useRef<Toast>(null);
+
+  const expenses: Array<ExpenseDropdown> = [
+    { name: ExpenseType.OTHER },
+    { name: ExpenseType.HOUSING_RENT },
+    { name: ExpenseType.TRANSPORTATION },
+    { name: ExpenseType.FOOD_SUPPLIES },
+    { name: ExpenseType.UTILITIES },
+    { name: ExpenseType.MEDICAL_HEALTH },
+    { name: ExpenseType.DINING_OUT },
+  ];
 
   const showSuccess = () => {
     toast.current?.show({
@@ -47,6 +56,7 @@ const AddView = (): ReactElement => {
       ipcRenderer.send(AppEvents.SAVE_EXPENSE, {
         date: date,
         expense: expense,
+        type: expenseType,
         amount: amount,
       } as Expense);
 
@@ -61,6 +71,10 @@ const AddView = (): ReactElement => {
             } else {
               showError();
             }
+            setDate(null);
+            setExpense("");
+            setExpenseType(null);
+            setAmount(null);
           }, 1000);
         }
       );
@@ -87,6 +101,18 @@ const AddView = (): ReactElement => {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setExpense(event.target.value)
           }
+        />
+      </div>
+      <div className="flex flex-wrap justify-content-center mt-4">
+        <Dropdown
+          className="w-full md:w-14rem mx-2"
+          value={{ name: expenseType }}
+          onChange={(event: DropdownChangeEvent) =>
+            setExpenseType(event.value.name)
+          }
+          options={expenses}
+          optionLabel="name"
+          placeholder="Select an expense type"
         />
         <InputNumber
           className="mx-2"

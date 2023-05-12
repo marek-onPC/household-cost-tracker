@@ -12,6 +12,20 @@ export enum AppEvents {
   LOAD_EXPENSES_RESPONSE = "load_expenses_response",
 }
 
+export enum ExpenseType {
+  OTHER = "Other",
+  HOUSING_RENT = "Housing and Rent",
+  TRANSPORTATION = "Transportation",
+  FOOD_SUPPLIES = "Food and daily supplies",
+  UTILITIES = "Utilities",
+  MEDICAL_HEALTH = "Medical and Health",
+  DINING_OUT = "Dining out and restaurants",
+}
+
+export interface ExpenseDropdown {
+  name: ExpenseType;
+}
+
 export enum DateType {
   DDMMYYYY = "dd.mm.yy",
   MMDDYYYY = "mm.dd.yyy",
@@ -52,6 +66,7 @@ export interface AppSettingsContext {
 export interface Expense {
   date: Date;
   expense: string;
+  type: ExpenseType;
   amount: number;
 }
 
