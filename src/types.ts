@@ -10,6 +10,8 @@ export enum AppEvents {
   SAVE_EXPENSE_RESPONSE = "save_expense_response",
   LOAD_EXPENSES = "load_expenses",
   LOAD_EXPENSES_RESPONSE = "load_expenses_response",
+  LOAD_AVAILABLE_EXPENSES_DATES = "load_available_expenses_dates",
+  LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE = "load_available_expenses_dates_response",
 }
 
 export enum ExpenseType {
@@ -74,3 +76,13 @@ export interface Expense {
 export interface ExpenseFileStructure {
   data: Array<Expense>;
 }
+
+export type AvailableExpensesDates = Array<{
+  key: string;
+  label: string;
+  selectable?: boolean;
+  children?: Array<{
+    key: string;
+    label: string;
+  }>;
+}>;

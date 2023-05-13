@@ -2,6 +2,7 @@ import { app, ipcMain } from "electron";
 import {
   AppEvents,
   AppSettingsContext,
+  AvailableExpensesDates,
   Expense,
   ExpenseFileStructure,
 } from "../types";
@@ -89,6 +90,30 @@ export const saveExpenseEvent = () => {
               event.reply(AppEvents.SAVE_EXPENSE_RESPONSE, true);
             }
           });
+        }
+      });
+    }
+  );
+};
+
+export const loadAvailableExpensesDatesEvent = () => {
+  ipcMain.on(
+    AppEvents.LOAD_AVAILABLE_EXPENSES_DATES,
+    (event: Electron.IpcMainEvent) => {
+      const availableExpensesDates: AvailableExpensesDates | null = null;
+
+      fs.readdirSync(`${USER_DATA_PATH}/expenses`).forEach((yearDir) => {
+        if (!Number.isNaN(Number.parseInt(yearDir))) {
+          // Assign here dir structure directly to availableExpensesDates to it could be used immediately
+
+          fs.readdirSync(`${USER_DATA_PATH}/expenses/${yearDir}`).forEach(
+            (monthDir) => {
+              if (!Number.isNaN(Number.parseInt(monthDir))) {
+                console.log(Number.parseInt(monthDir));
+                console.log(monthDir);
+              }
+            }
+          );
         }
       });
     }

@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import {
   closeAppEvent,
+  loadAvailableExpensesDatesEvent,
   loadSettingsEvent,
   saveExpenseEvent,
   saveSettingsEvent,
@@ -44,6 +45,7 @@ app.on("ready", () => {
   saveSettingsEvent();
   loadSettingsEvent();
   saveExpenseEvent();
+  loadAvailableExpensesDatesEvent();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
