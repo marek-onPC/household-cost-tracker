@@ -19,26 +19,6 @@ const ReviewView = (): ReactElement => {
   );
 
   useEffect(() => {
-    setExpenseDates([
-      {
-        key: "2022",
-        label: "2022",
-        selectable: false,
-        children: [
-          {
-            key: "2022-5",
-            label: "2022-5",
-          },
-          {
-            key: "2022-6",
-            label: "2022-6",
-          },
-        ],
-      },
-    ]);
-  }, []);
-
-  useEffect(() => {
     ipcRenderer.send(AppEvents.LOAD_AVAILABLE_EXPENSES_DATES);
 
     ipcRenderer.once(
@@ -47,22 +27,26 @@ const ReviewView = (): ReactElement => {
         if (!data) {
           setTimeout(() => {
             setIsLoadingDates(false);
-          }, 500);
+          }, 1500);
           return;
         }
 
         setExpenseDates(data);
         setTimeout(() => {
           setIsLoadingDates(false);
-        }, 500);
+        }, 1500);
       }
     );
   }, [setExpenseDates]);
 
+  useEffect(() => {
+    console.log(selectedExpenseDate);
+  }, [selectedExpenseDate]);
+
   return (
     <div className="flex flex-column align-items-center mt-4">
-      {isLoadingExpenses ? (
-        <div className="w-full h-screen flex flex-column align-items-center">
+      {isLoadingDates ? (
+        <div className="w-full h-10 flex flex-column align-items-center">
           <ProgressSpinner
             className="mt-8"
             style={{ width: "50px", height: "50px" }}
@@ -83,28 +67,40 @@ const ReviewView = (): ReactElement => {
               className="md:w-20rem w-full mb-5"
               placeholder="Select date"></TreeSelect>
           </div>
-          <Table
-            expenses={[
-              {
-                date: new Date(),
-                expense: "Watch",
-                type: ExpenseType.OTHER,
-                amount: 1231,
-              },
-              {
-                date: new Date(),
-                expense: "Black Watch",
-                type: ExpenseType.HOUSING_RENT,
-                amount: 4231321,
-              },
-              {
-                date: new Date(),
-                expense: "Watch asdasd",
-                type: ExpenseType.OTHER,
-                amount: 123111,
-              },
-            ]}
-          />
+          {isLoadingExpenses ? (
+            <div className="w-full h-5 flex flex-column align-items-center">
+              <ProgressSpinner
+                className="mt-8"
+                style={{ width: "50px", height: "50px" }}
+                strokeWidth="8"
+                fill="var(--surface-ground)"
+                animationDuration=".5s"
+              />
+            </div>
+          ) : (
+            <Table
+              expenses={[
+                {
+                  date: new Date(),
+                  expense: "Watch",
+                  type: ExpenseType.OTHER,
+                  amount: 1231,
+                },
+                {
+                  date: new Date(),
+                  expense: "Black Watch",
+                  type: ExpenseType.HOUSING_RENT,
+                  amount: 4231321,
+                },
+                {
+                  date: new Date(),
+                  expense: "Watch asdasd",
+                  type: ExpenseType.OTHER,
+                  amount: 123111,
+                },
+              ]}
+            />
+          )}
         </>
       )}
     </div>

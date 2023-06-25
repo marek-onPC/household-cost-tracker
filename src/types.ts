@@ -77,12 +77,16 @@ export interface ExpenseFileStructure {
   data: Array<Expense>;
 }
 
-export type AvailableExpensesDates = Array<{
+export type MonthlyExpanses = {
+  key: string;
+  label: string;
+};
+
+export type YearlyExpanses = {
   key: string;
   label: string;
   selectable?: boolean;
-  children?: Array<{
-    key: string;
-    label: string;
-  }>;
-}>;
+  children?: Array<MonthlyExpanses>;
+};
+
+export type AvailableExpensesDates = Array<YearlyExpanses>;

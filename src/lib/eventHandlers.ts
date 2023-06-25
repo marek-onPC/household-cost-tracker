@@ -5,6 +5,8 @@ import {
   AvailableExpensesDates,
   Expense,
   ExpenseFileStructure,
+  MonthlyExpanses,
+  YearlyExpanses,
 } from "../types";
 import fs from "fs";
 import { USER_DATA_PATH } from "../constants";
@@ -100,22 +102,45 @@ export const loadAvailableExpensesDatesEvent = () => {
   ipcMain.on(
     AppEvents.LOAD_AVAILABLE_EXPENSES_DATES,
     (event: Electron.IpcMainEvent) => {
-      const availableExpensesDates: AvailableExpensesDates | null = null;
+      const availableExpensesDates: AvailableExpensesDates | null = new Array();
 
       fs.readdirSync(`${USER_DATA_PATH}/expenses`).forEach((yearDir) => {
         if (!Number.isNaN(Number.parseInt(yearDir))) {
-          // Assign here dir structure directly to availableExpensesDates to it could be used immediately
+          const yearString = Number.parseInt(yearDir).toString();
+          const monthlyExpanses: Array<MonthlyExpanses> | null = new Array();
 
           fs.readdirSync(`${USER_DATA_PATH}/expenses/${yearDir}`).forEach(
             (monthDir) => {
               if (!Number.isNaN(Number.parseInt(monthDir))) {
-                console.log(Number.parseInt(monthDir));
-                console.log(monthDir);
+                const monthString = Number.parseInt(monthDir).toString();
+
+                monthlyExpanses.push({
+                  key: `${yearString}-${monthString}`,
+                  label: monthString,
+                });
               }
             }
           );
+
+          availableExpensesDates.push({
+            key: yearString,
+            label: yearString,
+            selectable: false,
+            children: monthlyExpanses,
+          });
         }
       });
+
+      if (!availableExpensesDates) {
+        event.reply(AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE, {
+          error: "No entries available",
+        });
+      } else {
+        event.reply(
+          AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
+          availableExpensesDates
+        );
+      }
     }
   );
 };
