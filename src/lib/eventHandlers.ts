@@ -6,7 +6,6 @@ import {
   Expense,
   ExpenseFileStructure,
   MonthlyExpanses,
-  YearlyExpanses,
 } from "../types";
 import fs from "fs";
 import { USER_DATA_PATH } from "../constants";
@@ -141,6 +140,24 @@ export const loadAvailableExpensesDatesEvent = () => {
           availableExpensesDates
         );
       }
+    }
+  );
+};
+
+export const loadExpensesEvent = () => {
+  ipcMain.on(
+    AppEvents.LOAD_EXPENSES,
+    (event: Electron.IpcMainEvent, data: string) => {
+      const { [0]: year, [1]: month } = data.split("-");
+      const DIR = `${USER_DATA_PATH}/expenses`;
+
+      fs.readFile(`${DIR}/${year}/${month}.json`, "utf8", (err, data) => {
+        if (err && err.code === "ENOENT") {
+          event.reply(AppEvents.LOAD_EXPENSES_RESPONSE, null);
+        } else {
+          event.reply(AppEvents.LOAD_EXPENSES_RESPONSE, data);
+        }
+      });
     }
   );
 };

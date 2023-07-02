@@ -1,21 +1,27 @@
-import { ReactElement } from "react";
+import { ReactElement, useContext } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
-import { Expense } from "../../types";
+import { AppSettingsContext, Expense } from "../../types";
+import { SettingsContext } from "../../../src/lib/SettingsContext";
+import { dateFormatter } from "../../../src/lib/dateFormatter";
 
 const Table = (props: { expenses: Array<Expense> }): ReactElement => {
+  const { settings }: AppSettingsContext = useContext(SettingsContext);
+
   const dateBodyTemplate = (rowData: Expense) => {
-    return `${rowData.date}`;
+    return dateFormatter(rowData.date, settings.dateType.format);
   };
 
   const expenseBodyTemplate = (rowData: Expense) => {
-    return `${rowData.expense}%`;
+    return (
+      <strong style={{ letterSpacing: "1.5px" }}>{rowData.expense}</strong>
+    );
   };
 
   const typeBodyTemplate = (rowData: Expense) => {
-    return `${rowData.type}`;
+    return rowData.type;
   };
 
   const amountBodyTemplate = (rowData: Expense) => {
@@ -25,7 +31,7 @@ const Table = (props: { expenses: Array<Expense> }): ReactElement => {
   const formatCurrency = (value: number) => {
     return value.toLocaleString("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: settings.currencyType.format,
     });
   };
 
