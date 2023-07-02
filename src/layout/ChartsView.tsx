@@ -4,15 +4,17 @@ import {
   AppEvents,
   AvailableExpensesDates,
   Expense,
+  ExpenseType,
 } from "../types";
 import { TreeSelect, TreeSelectChangeEvent } from "primereact/treeselect";
 import TreeNode from "primereact/treenode";
 import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Chart } from 'primereact/chart';
 
 const { ipcRenderer } = window.require("electron");
 
-const ReviewView = (): ReactElement => {
+const ChartsView = (): ReactElement => {
   const [isLoadingDates, setIsLoadingDates] = useState<boolean>(true);
   const [isLoadingExpenses, setIsLoadingExpenses] = useState<boolean>(true);
   const [expenseDates, setExpenseDates] = useState<Array<TreeNode> | null>(
@@ -21,9 +23,8 @@ const ReviewView = (): ReactElement => {
   const [selectedExpenseDate, setSelectedExpenseDate] = useState<string | null>(
     null
   );
-  const [expanseHistory, setExpanseHistory] = useState<Array<Expense> | null>(
-    null
-  );
+  const [chartData, setChartData] = useState({});
+  const [chartOptions, setChartOptions] = useState({});
 
   ipcRenderer.once(
     AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
@@ -51,8 +52,48 @@ const ReviewView = (): ReactElement => {
         }, 1500);
         return;
       }
-      const parsedData = JSON.parse(data) as { data: Array<Expense> };
-      setExpanseHistory(parsedData.data);
+      const { data: parsedData } = JSON.parse(data) as { data: Array<Expense> };
+
+      const expenseTypes = [...new Set(parsedData.map((item) => item.type))]
+      const expenseAmounts = new Array();
+
+      expenseTypes.forEach((type) => {
+        expenseAmounts.push(parsedData.filter((item) => item.type === type && item).map((item) => item.amount).reduce((sum, item) => sum + item, 0))
+      })
+
+      const documentStyle = getComputedStyle(document.documentElement);
+      const preformattedChartData = {
+        labels: expenseTypes,
+        datasets: [
+          {
+            data: expenseAmounts,
+            backgroundColor: [
+              documentStyle.getPropertyValue('--blue-500'),
+              documentStyle.getPropertyValue('--yellow-500'),
+              documentStyle.getPropertyValue('--green-500')
+            ],
+            hoverBackgroundColor: [
+              documentStyle.getPropertyValue('--blue-400'),
+              documentStyle.getPropertyValue('--yellow-400'),
+              documentStyle.getPropertyValue('--green-400')
+            ]
+          }
+        ]
+      }
+      const options = {
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true
+            }
+          }
+        }
+      };
+
+      setChartData(preformattedChartData);
+      setChartOptions(options);
+
+
 
       setTimeout(() => {
         setIsLoadingExpenses(false);
@@ -68,6 +109,7 @@ const ReviewView = (): ReactElement => {
     selectedExpenseDate &&
       ipcRenderer.send(AppEvents.LOAD_EXPENSES, selectedExpenseDate);
   }, [selectedExpenseDate]);
+
 
   return (
     <div className="flex flex-column align-items-center mt-4">
@@ -95,7 +137,7 @@ const ReviewView = (): ReactElement => {
           </div>
           {selectedExpenseDate ? (
             <>
-              {isLoadingExpenses && !expanseHistory ? (
+              {isLoadingExpenses && !chartData ? (
                 <div className="w-full h-5 flex flex-column align-items-center">
                   <ProgressSpinner
                     className="mt-8"
@@ -106,7 +148,7 @@ const ReviewView = (): ReactElement => {
                   />
                 </div>
               ) : (
-                <Table expenses={expanseHistory} />
+                <Chart type="pie" data={chartData} options={chartOptions} className="w-full md:w-30rem" />
               )}
             </>
           ) : null}
@@ -116,4 +158,4 @@ const ReviewView = (): ReactElement => {
   );
 };
 
-export default ReviewView;
+export default ChartsView;

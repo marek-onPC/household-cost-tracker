@@ -8,6 +8,7 @@ import { SettingsContext } from "../lib/SettingsContext";
 import { IpcRendererEvent } from "electron";
 import AddView from "./AddView";
 import ReviewView from "./ReviewView";
+import ChartsView from "./ChartsView";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -99,6 +100,12 @@ const MainStructure = (): ReactElement => {
               leftIcon="pi pi-wallet mr-3"
               disabled={shouldGrantAccess()}>
               <ReviewView />
+            </TabPanel>
+            <TabPanel
+              header="Charts"
+              leftIcon="pi pi-chart-bar mr-3"
+              disabled={shouldGrantAccess()}>
+              <ChartsView />
             </TabPanel>
             <TabPanel
               header="Settings"
