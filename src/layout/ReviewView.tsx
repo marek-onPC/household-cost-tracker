@@ -1,14 +1,19 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import Table from "./components/Table";
 import {
   AppEvents,
+  AppSettingsContext,
   AvailableExpensesDates,
   Expense,
+  MonthlyExpanses,
+  YearlyExpanses,
 } from "../types";
 import { TreeSelect, TreeSelectChangeEvent } from "primereact/treeselect";
 import TreeNode from "primereact/treenode";
 import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { dateFormatter } from "../../src/lib/dateFormatter";
+import { SettingsContext } from "../../src/lib/SettingsContext";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -24,6 +29,7 @@ const ReviewView = (): ReactElement => {
   const [expanseHistory, setExpanseHistory] = useState<Array<Expense> | null>(
     null
   );
+  const { settings }: AppSettingsContext = useContext(SettingsContext);
 
   ipcRenderer.once(
     AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
@@ -35,7 +41,24 @@ const ReviewView = (): ReactElement => {
         return;
       }
 
-      setExpenseDates(data);
+      const formattedData = data.map((year): YearlyExpanses => {
+        return {
+          key: year.key,
+          label: year.label,
+          children: year.children.map((month): MonthlyExpanses => {
+            return {
+              key: month.key,
+              label: dateFormatter(
+                new Date(month.key),
+                settings.dateType.format
+              ),
+            };
+          }),
+          selectable: false,
+        };
+      });
+
+      setExpenseDates(formattedData);
       setTimeout(() => {
         setIsLoadingDates(false);
       }, 1500);
@@ -91,7 +114,8 @@ const ReviewView = (): ReactElement => {
                 setSelectedExpenseDate(event.value.toString())
               }
               className="md:w-20rem w-full mb-5"
-              placeholder="Select date"></TreeSelect>
+              placeholder="Select date"
+            />
           </div>
           {selectedExpenseDate ? (
             <>

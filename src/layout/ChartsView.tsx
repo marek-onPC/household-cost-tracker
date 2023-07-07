@@ -1,16 +1,20 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import Table from "./components/Table";
 import {
   AppEvents,
+  AppSettingsContext,
   AvailableExpensesDates,
   Expense,
-  ExpenseType,
+  MonthlyExpanses,
+  YearlyExpanses,
 } from "../types";
 import { TreeSelect, TreeSelectChangeEvent } from "primereact/treeselect";
 import TreeNode from "primereact/treenode";
 import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { Chart } from 'primereact/chart';
+import { Chart } from "primereact/chart";
+import { SettingsContext } from "../../src/lib/SettingsContext";
+import { dateFormatter } from "../../src/lib/dateFormatter";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -25,6 +29,7 @@ const ChartsView = (): ReactElement => {
   );
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
+  const { settings }: AppSettingsContext = useContext(SettingsContext);
 
   ipcRenderer.once(
     AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
@@ -36,7 +41,24 @@ const ChartsView = (): ReactElement => {
         return;
       }
 
-      setExpenseDates(data);
+      const formattedData = data.map((year): YearlyExpanses => {
+        return {
+          key: year.key,
+          label: year.label,
+          children: year.children.map((month): MonthlyExpanses => {
+            return {
+              key: month.key,
+              label: dateFormatter(
+                new Date(month.key),
+                settings.dateType.format
+              ),
+            };
+          }),
+          selectable: false,
+        };
+      });
+
+      setExpenseDates(formattedData);
       setTimeout(() => {
         setIsLoadingDates(false);
       }, 1500);
@@ -54,12 +76,17 @@ const ChartsView = (): ReactElement => {
       }
       const { data: parsedData } = JSON.parse(data) as { data: Array<Expense> };
 
-      const expenseTypes = [...new Set(parsedData.map((item) => item.type))]
+      const expenseTypes = [...new Set(parsedData.map((item) => item.type))];
       const expenseAmounts = new Array();
 
       expenseTypes.forEach((type) => {
-        expenseAmounts.push(parsedData.filter((item) => item.type === type && item).map((item) => item.amount).reduce((sum, item) => sum + item, 0))
-      })
+        expenseAmounts.push(
+          parsedData
+            .filter((item) => item.type === type && item)
+            .map((item) => item.amount)
+            .reduce((sum, item) => sum + item, 0)
+        );
+      });
 
       const documentStyle = getComputedStyle(document.documentElement);
       const preformattedChartData = {
@@ -68,32 +95,30 @@ const ChartsView = (): ReactElement => {
           {
             data: expenseAmounts,
             backgroundColor: [
-              documentStyle.getPropertyValue('--blue-500'),
-              documentStyle.getPropertyValue('--yellow-500'),
-              documentStyle.getPropertyValue('--green-500')
+              documentStyle.getPropertyValue("--blue-500"),
+              documentStyle.getPropertyValue("--yellow-500"),
+              documentStyle.getPropertyValue("--green-500"),
             ],
             hoverBackgroundColor: [
-              documentStyle.getPropertyValue('--blue-400'),
-              documentStyle.getPropertyValue('--yellow-400'),
-              documentStyle.getPropertyValue('--green-400')
-            ]
-          }
-        ]
-      }
+              documentStyle.getPropertyValue("--blue-400"),
+              documentStyle.getPropertyValue("--yellow-400"),
+              documentStyle.getPropertyValue("--green-400"),
+            ],
+          },
+        ],
+      };
       const options = {
         plugins: {
           legend: {
             labels: {
-              usePointStyle: true
-            }
-          }
-        }
+              usePointStyle: true,
+            },
+          },
+        },
       };
 
       setChartData(preformattedChartData);
       setChartOptions(options);
-
-
 
       setTimeout(() => {
         setIsLoadingExpenses(false);
@@ -109,7 +134,6 @@ const ChartsView = (): ReactElement => {
     selectedExpenseDate &&
       ipcRenderer.send(AppEvents.LOAD_EXPENSES, selectedExpenseDate);
   }, [selectedExpenseDate]);
-
 
   return (
     <div className="flex flex-column align-items-center mt-4">
@@ -133,7 +157,8 @@ const ChartsView = (): ReactElement => {
                 setSelectedExpenseDate(event.value.toString())
               }
               className="md:w-20rem w-full mb-5"
-              placeholder="Select date"></TreeSelect>
+              placeholder="Select date"
+            />
           </div>
           {selectedExpenseDate ? (
             <>
@@ -148,7 +173,12 @@ const ChartsView = (): ReactElement => {
                   />
                 </div>
               ) : (
-                <Chart type="pie" data={chartData} options={chartOptions} className="w-full md:w-30rem" />
+                <Chart
+                  type="pie"
+                  data={chartData}
+                  options={chartOptions}
+                  className="w-full md:w-30rem"
+                />
               )}
             </>
           ) : null}

@@ -1,6 +1,6 @@
 import { DateType } from "../types";
 
-export const dateFormatter = (date: Date, format: DateType) => {
+export const dateFormatter = (date: Date, format: DateType): string => {
   const preformattedDate = new Date(date);
   let formattedDate: string = preformattedDate.toLocaleString();
 
