@@ -14,7 +14,7 @@ import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Chart } from "primereact/chart";
 import { SettingsContext } from "../../src/lib/SettingsContext";
-import { dateFormatter } from "../../src/lib/dateFormatter";
+import { dateFormatter } from "../lib/dateFormatters";
 import { SelectButton, SelectButtonChangeEvent } from "primereact/selectbutton";
 
 interface ChartTypeOption {

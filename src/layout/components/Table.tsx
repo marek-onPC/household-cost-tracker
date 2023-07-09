@@ -5,7 +5,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { AppSettingsContext, Expense } from "../../types";
 import { SettingsContext } from "../../../src/lib/SettingsContext";
-import { dateFormatter } from "../../../src/lib/dateFormatter";
+import { dateFormatter } from "../../lib/dateFormatters";
 
 const Table = (props: { expenses: Array<Expense> }): ReactElement => {
   const { settings }: AppSettingsContext = useContext(SettingsContext);

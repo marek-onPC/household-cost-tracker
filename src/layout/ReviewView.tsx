@@ -12,7 +12,7 @@ import { TreeSelect, TreeSelectChangeEvent } from "primereact/treeselect";
 import TreeNode from "primereact/treenode";
 import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { dateFormatter } from "../../src/lib/dateFormatter";
+import { dateFormatter } from "../lib/dateFormatters";
 import { SettingsContext } from "../../src/lib/SettingsContext";
 
 const { ipcRenderer } = window.require("electron");
