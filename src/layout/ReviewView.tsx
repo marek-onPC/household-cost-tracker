@@ -12,7 +12,7 @@ import { TreeSelect, TreeSelectChangeEvent } from "primereact/treeselect";
 import TreeNode from "primereact/treenode";
 import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { dateFormatter } from "../lib/dateFormatters";
+import { dropdownDateFormatter } from "../lib/dateFormatters";
 import { SettingsContext } from "../../src/lib/SettingsContext";
 
 const { ipcRenderer } = window.require("electron");
@@ -48,7 +48,7 @@ const ReviewView = (): ReactElement => {
           children: year.children.map((month): MonthlyExpanses => {
             return {
               key: month.key,
-              label: dateFormatter(
+              label: dropdownDateFormatter(
                 new Date(month.key),
                 settings.dateType.format
               ),

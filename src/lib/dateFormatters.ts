@@ -55,3 +55,55 @@ export const dateFormatter = (date: Date, format: DateType): string => {
   }
   return formattedDate;
 };
+
+export const dropdownDateFormatter = (date: Date, format: DateType): string => {
+  const preformattedDate = new Date(date);
+  let formattedDate: string = preformattedDate.toLocaleString();
+
+  switch (format) {
+    case DateType.DDMMYYYY:
+      {
+        const month =
+          (preformattedDate.getMonth() + 1).toString().length === 1
+            ? `0${(preformattedDate.getMonth() + 1).toString()}`
+            : (preformattedDate.getMonth() + 1).toString();
+        const year = preformattedDate.getFullYear();
+        formattedDate = `${month}.${year}`;
+      }
+      break;
+
+    case DateType.MMDDYYYY:
+      {
+        const month =
+          (preformattedDate.getMonth() + 1).toString().length === 1
+            ? `0${(preformattedDate.getMonth() + 1).toString()}`
+            : (preformattedDate.getMonth() + 1).toString();
+        const year = preformattedDate.getFullYear();
+        formattedDate = `${month}.${year}`;
+      }
+      break;
+
+    case DateType.YYYYMMDD:
+      {
+        const month =
+          (preformattedDate.getMonth() + 1).toString().length === 1
+            ? `0${(preformattedDate.getMonth() + 1).toString()}`
+            : (preformattedDate.getMonth() + 1).toString();
+        const year = preformattedDate.getFullYear();
+        formattedDate = `${year}.${month}`;
+      }
+      break;
+
+    case DateType.ASIA_YYYYMMDD:
+      {
+        const month =
+          (preformattedDate.getMonth() + 1).toString().length === 1
+            ? `0${(preformattedDate.getMonth() + 1).toString()}`
+            : (preformattedDate.getMonth() + 1).toString();
+        const year = preformattedDate.getFullYear();
+        formattedDate = `年${year}月${month}`;
+      }
+      break;
+  }
+  return formattedDate;
+};

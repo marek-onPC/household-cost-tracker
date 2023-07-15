@@ -14,7 +14,7 @@ import { IpcRendererEvent } from "electron";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Chart } from "primereact/chart";
 import { SettingsContext } from "../../src/lib/SettingsContext";
-import { dateFormatter } from "../lib/dateFormatters";
+import { dropdownDateFormatter } from "../lib/dateFormatters";
 import { SelectButton, SelectButtonChangeEvent } from "primereact/selectbutton";
 
 interface ChartTypeOption {
@@ -68,7 +68,7 @@ const ChartsView = (): ReactElement => {
           children: year.children.map((month): MonthlyExpanses => {
             return {
               key: month.key,
-              label: dateFormatter(
+              label: dropdownDateFormatter(
                 new Date(month.key),
                 settings.dateType.format
               ),
