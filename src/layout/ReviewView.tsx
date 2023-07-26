@@ -31,57 +31,59 @@ const ReviewView = (): ReactElement => {
   );
   const { settings }: AppSettingsContext = useContext(SettingsContext);
 
-  ipcRenderer.once(
-    AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
-    (event: IpcRendererEvent, data: AvailableExpensesDates | null) => {
-      if (!data) {
+  useEffect(() => {
+    ipcRenderer.once(
+      AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
+      (event: IpcRendererEvent, data: AvailableExpensesDates | null) => {
+        if (!data) {
+          setTimeout(() => {
+            setIsLoadingDates(false);
+          }, 1500);
+          return;
+        }
+
+        const formattedData = data.map((year): YearlyExpanses => {
+          return {
+            key: year.key,
+            label: year.label,
+            children: year.children.map((month): MonthlyExpanses => {
+              return {
+                key: month.key,
+                label: dropdownDateFormatter(
+                  new Date(month.key),
+                  settings.dateType.format
+                ),
+              };
+            }),
+            selectable: false,
+          };
+        });
+
+        setExpenseDates(formattedData);
         setTimeout(() => {
           setIsLoadingDates(false);
         }, 1500);
-        return;
       }
+    );
 
-      const formattedData = data.map((year): YearlyExpanses => {
-        return {
-          key: year.key,
-          label: year.label,
-          children: year.children.map((month): MonthlyExpanses => {
-            return {
-              key: month.key,
-              label: dropdownDateFormatter(
-                new Date(month.key),
-                settings.dateType.format
-              ),
-            };
-          }),
-          selectable: false,
-        };
-      });
+    ipcRenderer.on(
+      AppEvents.LOAD_EXPENSES_RESPONSE,
+      (event: IpcRendererEvent, data: string | null) => {
+        if (!data) {
+          setTimeout(() => {
+            setIsLoadingExpenses(false);
+          }, 1500);
+          return;
+        }
+        const parsedData = JSON.parse(data) as { data: Array<Expense> };
+        setExpanseHistory(parsedData.data);
 
-      setExpenseDates(formattedData);
-      setTimeout(() => {
-        setIsLoadingDates(false);
-      }, 1500);
-    }
-  );
-
-  ipcRenderer.once(
-    AppEvents.LOAD_EXPENSES_RESPONSE,
-    (event: IpcRendererEvent, data: string | null) => {
-      if (!data) {
         setTimeout(() => {
           setIsLoadingExpenses(false);
         }, 1500);
-        return;
       }
-      const parsedData = JSON.parse(data) as { data: Array<Expense> };
-      setExpanseHistory(parsedData.data);
-
-      setTimeout(() => {
-        setIsLoadingExpenses(false);
-      }, 1500);
-    }
-  );
+    );
+  }, []);
 
   useEffect(() => {
     ipcRenderer.send(AppEvents.LOAD_AVAILABLE_EXPENSES_DATES);

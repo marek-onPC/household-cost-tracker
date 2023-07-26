@@ -48,104 +48,104 @@ const ChartsView = (): ReactElement => {
   };
 
   useEffect(() => {
-    console.log(chartType);
-  }, [chartType]);
+    ipcRenderer.once(
+      AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
+      (event: IpcRendererEvent, data: AvailableExpensesDates | null) => {
+        if (!data) {
+          setTimeout(() => {
+            setIsLoadingDates(false);
+          }, 1500);
+          return;
+        }
 
-  ipcRenderer.once(
-    AppEvents.LOAD_AVAILABLE_EXPENSES_DATES_RESPONSE,
-    (event: IpcRendererEvent, data: AvailableExpensesDates | null) => {
-      if (!data) {
+        const formattedData = data.map((year): YearlyExpanses => {
+          return {
+            key: year.key,
+            label: year.label,
+            children: year.children.map((month): MonthlyExpanses => {
+              return {
+                key: month.key,
+                label: dropdownDateFormatter(
+                  new Date(month.key),
+                  settings.dateType.format
+                ),
+              };
+            }),
+            selectable: false,
+          };
+        });
+
+        setExpenseDates(formattedData);
         setTimeout(() => {
           setIsLoadingDates(false);
         }, 1500);
-        return;
       }
+    );
 
-      const formattedData = data.map((year): YearlyExpanses => {
-        return {
-          key: year.key,
-          label: year.label,
-          children: year.children.map((month): MonthlyExpanses => {
-            return {
-              key: month.key,
-              label: dropdownDateFormatter(
-                new Date(month.key),
-                settings.dateType.format
-              ),
-            };
-          }),
-          selectable: false,
+    ipcRenderer.on(
+      AppEvents.LOAD_EXPENSES_RESPONSE,
+      (event: IpcRendererEvent, data: string | null) => {
+        if (!data) {
+          setTimeout(() => {
+            setIsLoadingExpenses(false);
+          }, 1500);
+          return;
+        }
+        const { data: parsedData } = JSON.parse(data) as {
+          data: Array<Expense>;
         };
-      });
 
-      setExpenseDates(formattedData);
-      setTimeout(() => {
-        setIsLoadingDates(false);
-      }, 1500);
-    }
-  );
+        const expenseTypes = [...new Set(parsedData.map((item) => item.type))];
+        const expenseAmounts = new Array();
 
-  ipcRenderer.once(
-    AppEvents.LOAD_EXPENSES_RESPONSE,
-    (event: IpcRendererEvent, data: string | null) => {
-      if (!data) {
+        expenseTypes.forEach((type) => {
+          expenseAmounts.push(
+            parsedData
+              .filter((item) => item.type === type && item)
+              .map((item) => item.amount)
+              .reduce((sum, item) => sum + item, 0)
+          );
+        });
+
+        const documentStyle = getComputedStyle(document.documentElement);
+        const preformattedChartData = {
+          labels: expenseTypes,
+          datasets: [
+            {
+              label: "Expenses",
+              data: expenseAmounts,
+              backgroundColor: [
+                documentStyle.getPropertyValue("--blue-500"),
+                documentStyle.getPropertyValue("--yellow-500"),
+                documentStyle.getPropertyValue("--green-500"),
+              ],
+              hoverBackgroundColor: [
+                documentStyle.getPropertyValue("--blue-400"),
+                documentStyle.getPropertyValue("--yellow-400"),
+                documentStyle.getPropertyValue("--green-400"),
+              ],
+            },
+          ],
+        };
+        const options = {
+          plugins: {
+            legend: {
+              labels: {
+                usePointStyle: true,
+              },
+            },
+          },
+        };
+
+        setChartData(preformattedChartData);
+        setChartOptions(options);
+
         setTimeout(() => {
           setIsLoadingExpenses(false);
         }, 1500);
-        return;
       }
-      const { data: parsedData } = JSON.parse(data) as { data: Array<Expense> };
-
-      const expenseTypes = [...new Set(parsedData.map((item) => item.type))];
-      const expenseAmounts = new Array();
-
-      expenseTypes.forEach((type) => {
-        expenseAmounts.push(
-          parsedData
-            .filter((item) => item.type === type && item)
-            .map((item) => item.amount)
-            .reduce((sum, item) => sum + item, 0)
-        );
-      });
-
-      const documentStyle = getComputedStyle(document.documentElement);
-      const preformattedChartData = {
-        labels: expenseTypes,
-        datasets: [
-          {
-            label: "Expenses",
-            data: expenseAmounts,
-            backgroundColor: [
-              documentStyle.getPropertyValue("--blue-500"),
-              documentStyle.getPropertyValue("--yellow-500"),
-              documentStyle.getPropertyValue("--green-500"),
-            ],
-            hoverBackgroundColor: [
-              documentStyle.getPropertyValue("--blue-400"),
-              documentStyle.getPropertyValue("--yellow-400"),
-              documentStyle.getPropertyValue("--green-400"),
-            ],
-          },
-        ],
-      };
-      const options = {
-        plugins: {
-          legend: {
-            labels: {
-              usePointStyle: true,
-            },
-          },
-        },
-      };
-
-      setChartData(preformattedChartData);
-      setChartOptions(options);
-
-      setTimeout(() => {
-        setIsLoadingExpenses(false);
-      }, 1500);
-    }
-  );
+    );
+  }, []);
 
   useEffect(() => {
     ipcRenderer.send(AppEvents.LOAD_AVAILABLE_EXPENSES_DATES);
