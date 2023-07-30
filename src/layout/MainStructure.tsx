@@ -63,59 +63,67 @@ const MainStructure = (): ReactElement => {
 
   return (
     <SettingsContext.Provider value={settingsContentProvider}>
-      {isLoadingSettings ? (
-        <div className="w-full h-screen flex flex-column align-items-center ">
-          <h1
-            className="text-5xl font-light mt-8 text-indigo-200"
-            style={{ letterSpacing: "1.25px" }}>
-            Household Cost Tracker
-          </h1>
-          <ProgressSpinner
-            className="mt-8"
-            style={{ width: "50px", height: "50px" }}
-            strokeWidth="8"
-            fill="var(--surface-ground)"
-            animationDuration=".5s"
-          />
-        </div>
-      ) : (
-        <div className="fadein">
-          <div className="w-full flex mb-3 justify-content-end">
-            <Button
-              icon="pi pi-power-off"
-              rounded
-              aria-label="Quit"
-              onClick={closeApp}
+      <div id="header-window">
+        <p className="m-auto" style={{ fontSize: "12px" }}>
+          <strong>Household Cost Tracker</strong>
+        </p>
+      </div>
+
+      <div id="main-window">
+        {isLoadingSettings ? (
+          <div className="w-full h-screen flex flex-column align-items-center ">
+            <h1
+              className="text-5xl font-light mt-8 text-indigo-200"
+              style={{ letterSpacing: "1.25px" }}>
+              Household Cost Tracker
+            </h1>
+            <ProgressSpinner
+              className="mt-8"
+              style={{ width: "50px", height: "50px" }}
+              strokeWidth="8"
+              fill="var(--surface-ground)"
+              animationDuration=".5s"
             />
           </div>
-          <TabView activeIndex={shouldGrantAccess() ? 2 : 0}>
-            <TabPanel
-              header="Add expenses"
-              leftIcon="pi pi-money-bill mr-3"
-              disabled={shouldGrantAccess()}>
-              <AddView />
-            </TabPanel>
-            <TabPanel
-              header="Review monthly expenses"
-              leftIcon="pi pi-wallet mr-3"
-              disabled={shouldGrantAccess()}>
-              <ReviewView />
-            </TabPanel>
-            <TabPanel
-              header="Charts"
-              leftIcon="pi pi-chart-bar mr-3"
-              disabled={shouldGrantAccess()}>
-              <ChartsView />
-            </TabPanel>
-            <TabPanel
-              header="Settings"
-              leftIcon="pi pi-cog mr-3"
-              className="ml-auto">
-              <SettingsView />
-            </TabPanel>
-          </TabView>
-        </div>
-      )}
+        ) : (
+          <div className="fadein">
+            <div className="w-full flex mb-3 justify-content-end">
+              <Button
+                icon="pi pi-power-off"
+                rounded
+                aria-label="Quit"
+                onClick={closeApp}
+              />
+            </div>
+            <TabView activeIndex={shouldGrantAccess() ? 2 : 0}>
+              <TabPanel
+                header="Add expenses"
+                leftIcon="pi pi-money-bill mr-3"
+                disabled={shouldGrantAccess()}>
+                <AddView />
+              </TabPanel>
+              <TabPanel
+                header="Review monthly expenses"
+                leftIcon="pi pi-wallet mr-3"
+                disabled={shouldGrantAccess()}>
+                <ReviewView />
+              </TabPanel>
+              <TabPanel
+                header="Charts"
+                leftIcon="pi pi-chart-bar mr-3"
+                disabled={shouldGrantAccess()}>
+                <ChartsView />
+              </TabPanel>
+              <TabPanel
+                header="Settings"
+                leftIcon="pi pi-cog mr-3"
+                className="ml-auto">
+                <SettingsView />
+              </TabPanel>
+            </TabView>
+          </div>
+        )}
+      </div>
     </SettingsContext.Provider>
   );
 };

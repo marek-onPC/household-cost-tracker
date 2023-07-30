@@ -28,6 +28,9 @@ const createWindow = (): void => {
       nodeIntegration: true,
       contextIsolation: false,
     },
+    frame: false,
+    titleBarStyle: "customButtonsOnHover",
+    trafficLightPosition: { x: 10, y: 10 },
   });
 
   // and load the index.html of the app.
